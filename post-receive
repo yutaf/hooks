@@ -1,0 +1,52 @@
+#!/bin/sh
+while read oldrev newrev refname
+do
+    # branch
+    # branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+    # upper command puts error when the branch doesn't exist.
+    # so far, get the branch name from refname
+    branch=${refname##*/}
+
+    # TMPDIR
+    repo_name=`basename \`pwd\``
+    project_name=${repo_name%.*}
+    TMPDIR=~/checkouts/$project_name/$branch
+
+    # find out if the branch was deleted
+    git show-ref --verify --quiet $refname
+    if [ "$?" = 1 ]; then
+        rm -rf $TMPDIR
+        echo delete $TMPDIR
+        exit 0
+    fi
+
+    case $branch in
+        "develop")
+            destination=~/www/192.168.0.148/
+            ;;
+        release* | hotfix*)
+            ;;
+        "master")
+            destination=hogehoge
+            ;;
+        *)
+            # do nothing
+            exit 0
+            ;;
+    esac
+
+    if [ -e $TMPDIR ]; then
+        rm -rf $TMPDIR/*
+    else
+        mkdir -p $TMPDIR
+    fi
+
+    # checkout
+    env GIT_WORK_TREE=$TMPDIR git checkout -f $branch
+    cd $TMPDIR
+
+    # rsync
+    rsync -auv --size-only --exclude-from="exclude-rsync" ./ $destination
+    # --dry-run
+    #rsync -auvn --size-only --exclude-from="exclude-rsync" ./ $destination
+done
