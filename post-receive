@@ -35,10 +35,10 @@ do
 
     # rsync
     option='-rlpgoDuvc --size-only'
-    exclude_list=''
-    #exclude_list='exclude-rsync'
-    dryrun=''
-    #dryrun='--dry-run'
+    #exclude_list=''
+    exclude_list='exclude-rsync'
+    #dryrun=''
+    dryrun='--dry-run'
     #delete=''
     delete='--delete'
 
