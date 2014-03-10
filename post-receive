@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 while read oldrev newrev refname
 do
     # branch
@@ -27,7 +27,11 @@ do
     cd $tmp_checkout_dir
 
     # change permissions
-    chmod 777 logs user_logs data/token
+    permission_777_dirs=()
+    #permission_777_dirs=("logs" "user_logs")
+    for dir in ${permission_777_dirs[@]}; do
+        chmod 777 $dir
+    done
 
     # rsync
     option='-rlpgoDuvc --size-only'
