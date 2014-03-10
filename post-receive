@@ -7,18 +7,34 @@ do
     # so far, get the branch name from refname
     branch=${refname##*/}
 
-    # TMPDIR
+    # tmp_checkout_dir
     repo_name=`basename \`pwd\``
     project_name=${repo_name%.*}
-    TMPDIR=~/checkouts/$project_name/$branch
+    tmp_checkout_dir=~/checkouts/$project_name/$branch
 
-    # find out if the branch was deleted
+    # clean up
+    rm -rf $tmp_checkout_dir
+
+    # found out if the branch was deleted
     git show-ref --verify --quiet $refname
     if [ "$?" = 1 ]; then
-        rm -rf $TMPDIR
-        echo delete $TMPDIR
         exit 0
     fi
+
+    # checkout
+    mkdir -p $tmp_checkout_dir
+    env GIT_WORK_TREE=$tmp_checkout_dir git checkout -f $branch
+    cd $tmp_checkout_dir
+    # change permissions
+    chmod 777 logs user_logs data/token
+
+    # rsync
+    option='-rlpgoDuvc --size-only'
+    exclude='exclude-rsync'
+    dryrun=''
+    #dryrun='--dry-run'
+    #delete=''
+    delete='--delete'
 
     case $branch in
         "develop")
@@ -35,18 +51,5 @@ do
             ;;
     esac
 
-    if [ -e $TMPDIR ]; then
-        rm -rf $TMPDIR/*
-    else
-        mkdir -p $TMPDIR
-    fi
-
-    # checkout
-    env GIT_WORK_TREE=$TMPDIR git checkout -f $branch
-    cd $TMPDIR
-
-    # rsync
-    rsync -auv --size-only --exclude-from="exclude-rsync" ./ $destination
-    # --dry-run
-    #rsync -auvn --size-only --exclude-from="exclude-rsync" ./ $destination
+    rsync $option --exclude-from="$exclude" $dryrun $delete ./ $destination
 done
