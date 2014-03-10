@@ -44,12 +44,14 @@ do
 
     case $branch in
         "develop")
+            src=./
             destination=~/www/192.168.0.148/
             ;;
         release* | hotfix*)
             exit 0
             ;;
         "master")
+            src=./htdocs/
             destination=hogehoge
             ;;
         *)
@@ -58,5 +60,5 @@ do
             ;;
     esac
 
-    rsync $option --exclude-from="$exclude_list" $dryrun $delete ./ $destination
+    rsync $option --exclude-from="$exclude_list" $dryrun $delete $src $destination
 done
