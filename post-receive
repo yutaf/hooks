@@ -27,8 +27,8 @@ do
     cd $tmp_checkout_dir
 
     # change permissions
-    permission_777_dirs=()
-    #permission_777_dirs=("logs" "user_logs")
+    #permission_777_dirs=()
+    permission_777_dirs=("logs" "user_logs")
     for dir in ${permission_777_dirs[@]}; do
         chmod 777 $dir
     done
@@ -47,6 +47,7 @@ do
             destination=~/www/192.168.0.148/
             ;;
         release* | hotfix*)
+            exit 0
             ;;
         "master")
             destination=hogehoge
