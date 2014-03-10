@@ -25,12 +25,14 @@ do
     mkdir -p $tmp_checkout_dir
     env GIT_WORK_TREE=$tmp_checkout_dir git checkout -f $branch
     cd $tmp_checkout_dir
+
     # change permissions
     chmod 777 logs user_logs data/token
 
     # rsync
     option='-rlpgoDuvc --size-only'
-    exclude='exclude-rsync'
+    exclude_list=''
+    #exclude_list='exclude-rsync'
     dryrun=''
     #dryrun='--dry-run'
     #delete=''
@@ -51,5 +53,5 @@ do
             ;;
     esac
 
-    rsync $option --exclude-from="$exclude" $dryrun $delete ./ $destination
+    rsync $option --exclude-from="$exclude_list" $dryrun $delete ./ $destination
 done
