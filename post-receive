@@ -8,7 +8,7 @@ do
     branch=${refname##*/}
 
     # tmp_checkout_dir
-    repo_name=`basename \`pwd\``
+    repo_name=$(basename $(pwd))
     project_name=${repo_name%.*}
     tmp_checkout_dir=~/checkouts/$project_name/$branch
 
