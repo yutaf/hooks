@@ -1,0 +1,35 @@
+#!/bin/sh
+
+refname="$1"
+oldrev="$2"
+newrev="$3"
+
+# ${var##/*/} は，'/*/'に一致する文字列をすべて削除する
+#branch="${refname##*/}"
+branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+echo $branch
+
+case $branch in
+    "master")
+        permitted_users=("yutaf")
+        for permitted_user in ${permitted_users[@]}; do
+            if [ "$permitted_user" = "${REMOTE_USER}" ]; then
+                exit 0
+            fi
+        done
+
+        echo "You are not permitted to push to ${branch}"
+        exit -1
+        ;;
+    "develop")
+        exit 0
+        ;;
+    release* | hotfix*)
+        exit 0
+        ;;
+    *)
+        # do nothing
+        echo "${branch} is not a branch for push"
+        exit -1
+        ;;
+esac
