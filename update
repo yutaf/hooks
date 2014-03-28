@@ -14,6 +14,7 @@ case $branch in
         permitted_users=("yutaf")
         for permitted_user in ${permitted_users[@]}; do
             if [ "$permitted_user" = "${REMOTE_USER}" ]; then
+                # ${REMOTE_USER} は /home/git/.ssh/authorized_keys に記述
                 exit 0
             fi
         done
