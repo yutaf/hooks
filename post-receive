@@ -7,32 +7,6 @@ do
     # so far, get the branch name from refname
     branch=${refname##*/}
 
-    # tmp_checkout_dir
-    repo_name=$(basename $(pwd))
-    project_name=${repo_name%.*}
-    tmp_checkout_dir=~/checkouts/$project_name/$branch
-
-    # clean up
-    rm -rf $tmp_checkout_dir
-
-    # found out if the branch was deleted
-    git show-ref --verify --quiet $refname
-    if [ "$?" = 1 ]; then
-        exit 0
-    fi
-
-    # checkout
-    mkdir -p $tmp_checkout_dir
-    env GIT_WORK_TREE=$tmp_checkout_dir git checkout -f $branch
-    cd $tmp_checkout_dir
-
-    # change permissions
-    #permission_777_dirs=()
-    permission_777_dirs=("logs" "user_logs")
-    for dir in ${permission_777_dirs[@]}; do
-        chmod 777 $dir
-    done
-
     # rsync
     option='-rlpgoDuvc --size-only'
     #exclude_list=''
@@ -59,6 +33,32 @@ do
             exit 0
             ;;
     esac
+
+    # tmp_checkout_dir
+    repo_name=$(basename $(pwd))
+    project_name=${repo_name%.*}
+    tmp_checkout_dir=~/checkouts/$project_name/$branch
+
+    # clean up
+    rm -rf $tmp_checkout_dir
+
+    # found out if the branch was deleted
+    git show-ref --verify --quiet $refname
+    if [ "$?" = 1 ]; then
+        exit 0
+    fi
+
+    # checkout
+    mkdir -p $tmp_checkout_dir
+    env GIT_WORK_TREE=$tmp_checkout_dir git checkout -f $branch
+    cd $tmp_checkout_dir
+
+    # change permissions
+    #permission_777_dirs=()
+    permission_777_dirs=("logs" "user_logs")
+    for dir in ${permission_777_dirs[@]}; do
+        chmod 777 $dir
+    done
 
     rsync $option --exclude-from="$exclude_list" $dryrun $delete $src $destination
 done
