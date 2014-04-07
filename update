@@ -5,9 +5,8 @@ oldrev="$2"
 newrev="$3"
 
 # ${var##/*/} は，'/*/'に一致する文字列をすべて削除する
-#branch="${refname##*/}"
-branch=$(git rev-parse --symbolic --abbrev-ref $refname)
-echo $branch
+branch="${refname##*/}"
+#branch=$(git rev-parse --symbolic --abbrev-ref $refname)
 
 case $branch in
     "master")
@@ -33,7 +32,8 @@ case $branch in
         ;;
     *)
         # do nothing
-        echo "${branch} is not a branch for push"
-        exit -1
+        #echo "${branch} is not a branch for push"
+        #exit -1
+        exit 0
         ;;
 esac
