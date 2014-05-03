@@ -5,8 +5,8 @@ oldrev="$2"
 newrev="$3"
 
 # ${var##/*/} は，'/*/'に一致する文字列をすべて削除する
-branch="${refname##*/}"
-#branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+#branch="${refname##*/}"
+branch=$(git rev-parse --symbolic --abbrev-ref $refname)
 
 case $branch in
     "master")
