@@ -2,10 +2,10 @@
 while read oldrev newrev refname
 do
     # branch
-    # branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+    branch=$(git rev-parse --symbolic --abbrev-ref $refname)
     # upper command puts error when the branch doesn't exist.
     # so far, get the branch name from refname
-    branch=${refname##*/}
+    #branch=${refname##*/}
 
     # rsync
     option='-rlpgoDuvc --size-only'
@@ -15,18 +15,26 @@ do
     dryrun='--dry-run'
     #delete=''
     delete='--delete'
+    src=./*
 
     case $branch in
         "develop")
-            src=./
-            destination=~/www/192.168.0.148/
+            #TODO 開発機にデプロイ
+            destination=~/www/192.168.0.144/
+            exit 0
             ;;
-        release* | hotfix*)
+        release*)
+            #TODO プレビュー
+            destination=ssh_hoge:/foo/bar/
+            exit 0
+            ;;
+        hotfix*)
             exit 0
             ;;
         "master")
-            src=./htdocs/
+            # TODO live
             destination=hogehoge
+            exit 0
             ;;
         *)
             # do nothing
@@ -49,13 +57,13 @@ do
     fi
 
     # checkout
+    umask 022
     mkdir -p $tmp_checkout_dir
     env GIT_WORK_TREE=$tmp_checkout_dir git checkout -f $branch
     cd $tmp_checkout_dir
 
     # change permissions
-    #permission_777_dirs=()
-    permission_777_dirs=("logs" "user_logs")
+    permission_777_dirs=("logs/php_error" "logs/app")
     for dir in ${permission_777_dirs[@]}; do
         chmod 777 $dir
     done
