@@ -11,7 +11,6 @@ do
     option='-rlpgoDuvc --size-only'
     #exclude_list=''
     exclude_list='exclude-rsync'
-    #dryrun=''
     dryrun='--dry-run'
     #delete=''
     delete='--delete'
@@ -20,20 +19,26 @@ do
     case $branch in
         "develop")
             #TODO 開発機にデプロイ
-            destination=~/www/192.168.0.144/
+            #dryrun=''
+            nodes=("/home/git/www/192.168.0.144/")
+            umask 002
             exit 0
             ;;
         release*)
             #TODO プレビュー
-            destination=ssh_hoge:/foo/bar/
+            #dryrun=''
+            nodes=("ssh_hoge:/foo/bar/")
+            umask 022
             exit 0
             ;;
         hotfix*)
             exit 0
             ;;
-        "master")
+        "master" | deployment* )
             # TODO live
-            destination=hogehoge
+            #dryrun=''
+            nodes=("ssh_host1:/var/www/html/baz/" "ssh_host2:/var/www/html/baz/")
+            umask 002
             exit 0
             ;;
         *)
@@ -57,7 +62,6 @@ do
     fi
 
     # checkout
-    umask 022
     mkdir -p $tmp_checkout_dir
     env GIT_WORK_TREE=$tmp_checkout_dir git checkout -f $branch
     cd $tmp_checkout_dir
@@ -65,8 +69,13 @@ do
     # change permissions
     permission_777_dirs=("logs/php_error" "logs/app")
     for dir in ${permission_777_dirs[@]}; do
-        chmod 777 $dir
+        if [ -e $dir ]; then
+            chmod 777 $dir
+        fi
     done
 
-    rsync $option --exclude-from="$exclude_list" $dryrun $delete $src $destination
+    # execute rsync
+    for node in ${nodes[@]}; do
+        rsync $option --exclude-from="$exclude_list" $dryrun $delete $src $node
+    done
 done
