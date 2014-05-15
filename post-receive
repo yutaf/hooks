@@ -8,7 +8,7 @@ do
     #branch=${refname##*/}
 
     # rsync
-    option='-rlpgoDuvc --size-only'
+    option='-rlpgoDuvcK --size-only'
     #exclude_list=''
     exclude_list='exclude-rsync'
     dryrun='--dry-run'
